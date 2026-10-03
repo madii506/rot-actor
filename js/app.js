@@ -1,7 +1,7 @@
-// rot.actor main page: smooth scroll, the hero cast, the recipe ride, the launchpad, the bestiary, the stage, bloodlines.
+// rot.actor main page: smooth scroll, the hero cast, the recipe ride, the launchpad, the bestiary, bloodlines.
 import { $, $$, esc, short, usd, ago, api, proxied, toast, reduced, confetti, loadImg } from './util.js';
 import { initLab, connect, disconnect, wallet, trending } from './lab.js';
-import { initHero, CAST } from './hero.js';
+import { initHero } from './hero.js';
 import { dna, portrait, tint } from './creature.js';
 import { houseName } from './names.js';
 
@@ -14,6 +14,8 @@ const S = { coins: [], parents: [], cfg: {}, tab: 'new', acts: [], act: 0, claps
 /* ---------- smooth scroll + triggers ---------- */
 let lenis = null;
 if (gsap && ST) gsap.registerPlugin(ST);
+// keep timelines on real time: a slow first WebGL frame must not freeze the hero copy
+if (gsap) gsap.ticker.lagSmoothing(0);
 if (!calm && window.Lenis && !Q.has('nosmooth')) {
   lenis = new window.Lenis({ duration: 1.1, smoothWheel: true, wheelMultiplier: 1, touchMultiplier: 1.4 });
   lenis.on('scroll', () => ST && ST.update()); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
@@ -48,7 +50,7 @@ function startHero() {
     tl.from('#heroWord', { y: 60, scale: .8, opacity: 0, duration: .9, ease: 'back.out(1.8)' })
       .from('#heroWord .ge', { scale: 0, duration: .6, stagger: .12, ease: 'back.out(3)' }, '-=.4')
       .from('.tag span', { y: 40, opacity: 0, stagger: .12, duration: .6, ease: 'back.out(2)' }, '-=.3')
-      .from('.hero-copy .sub, .hero-copy .cta, .hero-copy .hero-live', { y: 24, opacity: 0, stagger: .08, duration: .5 }, '-=.2');
+      .from('.hero-copy .sub, .hero-copy .cta', { y: 24, opacity: 0, stagger: .08, duration: .5 }, '-=.2');
   }
 }
 if (gsap && ST && !calm) {
@@ -94,9 +96,6 @@ if (gsap && ST) {
   }
   gsap.utils.toArray('.lab .split, .bestiary .split, .bloodlines .split, .faq .split').forEach(h => { if (!calm) gsap.from(h.querySelectorAll('.wi'), { yPercent: 110, rotate: 6, stagger: .06, duration: .7, ease: 'back.out(1.7)', scrollTrigger: { trigger: h, start: 'top 85%' } }); });
   ST.batch('[data-r]', { start: 'top 88%', onEnter: els => gsap.to(els, { opacity: 1, y: 0, stagger: .08, duration: .7, ease: 'back.out(1.4)', overwrite: true }) });
-  // stage curtains open as you arrive
-  gsap.fromTo('.curtain.l', { xPercent: 0, scaleX: 1 }, { xPercent: -88, scaleX: .55, ease: 'none', scrollTrigger: { trigger: '#stage', start: 'top 75%', end: 'top 15%', scrub: true } });
-  gsap.fromTo('.curtain.r', { xPercent: 0, scaleX: 1 }, { xPercent: 88, scaleX: .55, ease: 'none', scrollTrigger: { trigger: '#stage', start: 'top 75%', end: 'top 15%', scrub: true } });
   addEventListener('load', () => ST.refresh());
 } else $$('[data-r]').forEach(e => { e.style.opacity = 1; e.style.transform = 'none'; });
 
@@ -105,9 +104,9 @@ if (gsap && ST) {
 if (!mobile && !calm) for (const b of $$('.btn.big, .btn.gold')) { b.addEventListener('pointermove', e => { const r = b.getBoundingClientRect(); b.style.translate = `${(e.clientX - r.left - r.width / 2) * .18}px ${(e.clientY - r.top - r.height / 2) * .28}px`; }); b.addEventListener('pointerleave', () => { b.style.translate = ''; }); }
 
 /* ---------- lab ---------- */
-initLab({ mobile });
+const lab = initLab({ mobile });
 
-/* ---------- data: bestiary, stage, bloodlines ---------- */
+/* ---------- data: bestiary, bloodlines ---------- */
 function look(c) { // rebuild a born coin's DNA from its memo
   const [s, code] = String(c.salt || '').split('.'); const d = dna(c.a, c.b, s || ''); if (code && code.length >= 7) { d.dough = DOUGHS[+code[0]] || d.dough; d.accent = '#' + code.slice(1, 7); } return d;
 }
@@ -124,7 +123,7 @@ function card(c) {
 }
 function renderGrid() {
   const l = [...S.coins]; const sort = { new: (a, b) => b.t - a.t, top: (a, b) => (b.mcap || 0) - (a.mcap || 0), gen: (a, b) => (b.gen || 0) - (a.gen || 0) || b.t - a.t, kids: (a, b) => (b.kids || 0) - (a.kids || 0) || b.t - a.t }[S.tab];
-  l.sort(sort); $('#grid').innerHTML = l.slice(0, 60).map(card).join(''); $('#bEmpty').hidden = l.length > 0;
+  l.sort(sort); $('#grid').innerHTML = l.slice(0, 60).map(card).join(''); $('#bEmpty').hidden = l.length > 0; $('.tabs').hidden = !l.length;
 }
 $('.tabs').addEventListener('click', e => { const b = e.target.closest('button[data-tab]'); if (!b) return; $$('.tabs button').forEach(x => x.classList.toggle('on', x === b)); S.tab = b.dataset.tab; renderGrid(); });
 $('#grid').addEventListener('pointermove', e => { const c = e.target.closest('.card'); if (!c || mobile) return; const r = c.getBoundingClientRect(); const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; c.style.transform = `rotateY(${x * 14}deg) rotateX(${-y * 14}deg) translateY(-6px)`; });
@@ -134,34 +133,20 @@ function stats() {
   const born = S.coins.length, fams = new Set(S.coins.map(c => [c.a, c.b].sort().join())).size, gen = S.coins.reduce((m, c) => Math.max(m, c.gen || 0), 0);
   const today = S.coins.filter(c => Date.now() - c.t < 864e5).length;
   $('#bBorn').textContent = born; $('#bFam').textContent = fams; $('#bGen').textContent = born ? gen : '—';
-  $('#liveBorn').textContent = today + ' launched today'; $('#liveFam').textContent = fams + (fams === 1 ? ' pair' : ' pairs'); $('#liveGen').textContent = 'deepest gen ' + (born ? gen : '—');
+  $('#bStats').hidden = !born;
   const w = S.parents.filter(p => p.symbol); $('#wantedBox').hidden = !w.length;
   $('#wanted').innerHTML = w.map(p => `<a href="/#fuse?a=${esc(p.mint)}" data-fuse="${esc(p.mint)}"><img src="${esc(p.icon || '')}" alt="" onerror="this.style.visibility='hidden'">$${esc(p.symbol)}<em>${p.kids} ${p.kids === 1 ? 'child' : 'children'}</em></a>`).join('');
 }
-$('#wanted').addEventListener('click', e => { const a = e.target.closest('a[data-fuse]'); if (!a) return; e.preventDefault(); location.hash = '#fuse?a=' + a.dataset.fuse; location.reload(); });
+$('#wanted').addEventListener('click', e => { const a = e.target.closest('a[data-fuse]'); if (!a) return; e.preventDefault(); const p = S.parents.find(x => x.mint === a.dataset.fuse); if (p) { lab.setParent('a', null); lab.setParent('a', p); } go('#fuse'); });
 
-/* stage */
-function buildActs() {
-  const born = S.coins.filter(c => c.name).slice(0, 20).map(c => { const d = look(c); return { img: imgFor(c), name: c.name, sub: `$${c.symbol} · $${(c.pa && c.pa.symbol) || '?'} × $${(c.pb && c.pb.symbol) || '?'}`, line: `${c.name}! ${c.name}! Nato da $${(c.pa && c.pa.symbol) || '?'} e $${(c.pb && c.pb.symbol) || '?'}!`, d, href: '/c/' + c.mint }; });
-  const house = CAST.map((d, i) => { const n = houseName({ name: ['Bonko', 'Wiffo', 'Moonzo', 'Pumpo', 'Sendo', 'Rugga'][i], symbol: 'HOUSE' + i, mint: 'h' + i }, { name: ['Lambo', 'Degen', 'Candle', 'Whale', 'Floor', 'Chart'][i], symbol: 'ACT' + i, mint: 'a' + i }, 'house');
-    return { img: null, d, name: n.name, sub: 'demo act · not a coin', line: n.line }; });
-  S.acts = born.length ? born.concat(house.slice(0, 2)) : house; S.act = 0; showAct(false);
-}
-let actT = 0;
-function showAct(play) {
-  const a = S.acts[S.act % S.acts.length]; if (!a) return; actT++; if (!a.img) { try { a.img = portrait(a.d, 512); } catch (e) { a.img = '/assets/rot-egg.png'; } }
-  $('#actImg').src = a.img; $('#actName').textContent = a.name; $('#actSub').textContent = a.sub; $('#actLine').textContent = a.line; $('#actLine').classList.remove('on'); $('#performer').classList.remove('act');
-  if (gsap && !calm) gsap.fromTo('#performer', { y: 80, opacity: 0, rotate: -8 }, { y: 0, opacity: 1, rotate: 0, duration: .7, ease: 'back.out(1.8)' });
-  if (play) perform();
-}
-function perform() { // no audio: the catchphrase types into the bubble while the act dances
-  const a = S.acts[S.act % S.acts.length]; if (!a) return; const el = $('#actLine'), my = ++actT, words = String(a.line).split(/\s+/); let k = 0;
-  $('#performer').classList.add('act'); el.textContent = ''; el.classList.add('on');
-  (function tick() { if (my !== actT) return; el.textContent = words.slice(0, ++k).join(' '); if (k < words.length) setTimeout(tick, calm ? 0 : 240); else setTimeout(() => { if (my === actT) $('#performer').classList.remove('act'); }, 1400); })();
-}
-$('#actPlay').addEventListener('click', perform);
-$('#actNext').addEventListener('click', () => { S.act++; showAct(true); });
-$('#actClap').addEventListener('click', e => { S.claps++; $('#clapN').textContent = S.claps; confetti(40); if (gsap) gsap.fromTo('#performer img', { scale: 1.12 }, { scale: 1, duration: .5, ease: 'elastic.out(1,.4)' }); });
+/* bestiary empty state: real memecoin pairs to start from, one tap loads them into the launchpad */
+const TRY = [['BONK', 'WIF'], ['POPCAT', 'MEW'], ['FARTCOIN', 'PENGU'], ['MOODENG', 'GOAT']];
+trending().then(j => { const l = (j && j.ok && j.list) || [], used = new Set(), box = $('#tryPairs');
+  const take = s => { const t = l.find(t => String(t.symbol).toUpperCase() === s && !used.has(t.mint)) || l.find(t => !used.has(t.mint)); if (t) used.add(t.mint); return t; };
+  const pairs = TRY.map(([x, y]) => [take(x), take(y)]).filter(p => p[0] && p[1]); box._pairs = pairs;
+  const sym = t => '$' + String(t.symbol || '').toUpperCase(), ic = t => `<img src="${esc(proxied(t.icon))}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`;
+  box.innerHTML = pairs.map(([x, y], k) => `<button type="button" class="tp" data-k="${k}"><span class="tp-eyes" aria-hidden="true"><i class="ge"><b></b></i><i class="ge"><b></b></i></span><span class="tp-coins">${ic(x)}${ic(y)}</span><span class="tp-name">${esc(sym(x))} × ${esc(sym(y))}</span><span class="tp-go">Pair these →</span></button>`).join(''); });
+$('#tryPairs').addEventListener('click', e => { const t = e.target.closest('.tp'); if (!t) return; const [x, y] = $('#tryPairs')._pairs[+t.dataset.k]; lab.setParent('a', null); lab.setParent('b', null); lab.setParent('a', x); lab.setParent('b', y); go('#fuse'); });
 
 /* bloodlines */
 function treeSVG(root, by) {
@@ -188,8 +173,9 @@ function renderTree() {
 
 async function loadCoins() {
   const j = await api('/api/coins', {}, 30000);
-  if (j && j.ok) { S.coins = (j.coins || []).filter(c => c && c.mint); S.parents = j.parents || []; S.cfg = j.cfg || {}; } else if (!S.coins.length) { $('#liveBorn').textContent = 'bestiary offline'; }
-  renderGrid(); stats(); renderTree(); if (stageReady) buildActs(); cfgUI(); ST && ST.refresh();
+  if (j && j.ok) { S.coins = (j.coins || []).filter(c => c && c.mint); S.parents = j.parents || []; S.cfg = j.cfg || {}; } else if (!S.coins.length) { $('#bEmptyT').textContent = 'The bestiary is offline right now.'; }
+  if (j && j.ok) $('#bEmptyT').textContent = 'No launches yet.';
+  renderGrid(); stats(); renderTree(); cfgUI(); ST && ST.refresh();
 }
 function cfgUI() {
   const c = S.cfg || {}; if (c.X) { const x = $('#navX'); if (x) { x.href = c.X; x.hidden = false; } }
@@ -198,6 +184,6 @@ function cfgUI() {
 $('#rotCopy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(S.cfg.CA || ''); toast('Copied.'); } catch (e) { toast(S.cfg.CA || ''); } });
 document.addEventListener('rot:born', () => setTimeout(loadCoins, 20000));
 renderGrid(); renderTree(); loadCoins();
-let stageReady = false; new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { stageReady = true; buildActs(); o.disconnect(); } }, { rootMargin: '700px 0px' }).observe($('#stage')); setInterval(() => { if (!document.hidden) loadCoins(); }, 60000);
+setInterval(() => { if (!document.hidden) loadCoins(); }, 60000);
 if (location.hash.startsWith('#fuse')) setTimeout(() => go('#fuse'), 400);
 window.__rot = { S, go, loadCoins, ready: true };
