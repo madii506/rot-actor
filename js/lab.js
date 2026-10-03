@@ -1,13 +1,13 @@
-// The lab: pick two parents, fuse them in the pot, name the bambino, launch it on pump.fun from your own wallet.
-import { $, $$, B58, REG, esc, short, usd, api, post, proxied, toast, loadImg, confetti } from './util.js';
+// The launchpad: pick two coins, fuse them, name the brainrot, launch it on pump.fun from your own wallet.
+import { $, $$, B58, REG, esc, short, usd, api, post, proxied, toast, loadImg, confetti, reduced } from './util.js';
 import { dna, tint, portrait } from './creature.js';
 import { houseName } from './names.js';
-import { say, stop } from './tts.js';
-import { initPot } from './pot.js';
 
 const MEMO = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr', CB = 'ComputeBudget111111111111111111111111111111';
 const DOUGHS = ['classico', 'spinaci', 'pomodoro', 'nero', 'barbabietola', 'curcuma', 'viola'];
-const S = { a: null, b: null, ta: null, tb: null, salt: '', d: null, nm: null, img: null, own: null, busy: false, pot: null, trend: [] };
+const S = { a: null, b: null, ta: null, tb: null, salt: '', d: null, nm: null, img: null, own: null, busy: false, pot: null, trend: [], trendDone: false };
+// one shared request for the memecoin list (the recipe uses it too)
+let trendP = null; export const trending = () => trendP || (trendP = api('/api/trending', {}, 30000));
 export const wallet = { addr: null, listeners: new Set() };
 const provider = () => (window.phantom && window.phantom.solana) || window.solflare || window.backpack || window.solana || null;
 export async function connect() {
@@ -24,7 +24,7 @@ function setParent(k, t) {
   if (t) { box.innerHTML = chosenHTML(t); box.hidden = false; pick.hidden = true; $('#d' + k).innerHTML = ''; box.closest('.slot').classList.add('full'); }
   else { box.hidden = true; pick.hidden = false; $('#q' + k).value = ''; box.closest('.slot').classList.remove('full'); }
   $('#fuseBtn').disabled = !(S.a && S.b) || S.busy; $('#fuseBtn').classList.toggle('ready', !!(S.a && S.b));
-  const nowB = S.a && S.b; $('#potHint').textContent = nowB ? `$${S.a.symbol} × $${S.b.symbol}. Into the pot?` : S.a || S.b ? 'One more coin.' : 'Pick two coins.';
+  const nowB = S.a && S.b; $('#potHint').textContent = nowB ? `$${S.a.symbol} × $${S.b.symbol}. Ready to fuse.` : S.a || S.b ? 'One more coin.' : 'Pick two coins.';
   renderChips();
 }
 async function lookup(k) {
@@ -38,7 +38,7 @@ async function lookup(k) {
   drop._list = l;
 }
 function renderChips() {
-  const el = $('#chips'); if (!S.trend.length) { el.innerHTML = '<span class="dl">Trending list unavailable right now. Paste any contract address above.</span>'; return; }
+  const el = $('#chips'); if (!S.trend.length) { el.innerHTML = S.trendDone ? '<span class="dl">The coin list is unavailable right now. Paste any contract address above.</span>' : '<span class="dl">Loading memecoins…</span>'; return; }
   el.innerHTML = S.trend.map((t, i) => `<button type="button" class="chip${(S.a && S.a.mint === t.mint) || (S.b && S.b.mint === t.mint) ? ' on' : ''}" data-i="${i}"><img src="${esc(proxied(t.icon))}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">$${esc(t.symbol)}</button>`).join('');
 }
 const rndSalt = () => Math.random().toString(36).slice(2, 6);
@@ -53,26 +53,25 @@ async function nameIt() {
 }
 function fill() {
   const n = S.nm; $('#fName').value = n.name; $('#fTick').value = n.ticker; $('#fLore').value = n.lore;
-  $('#certName').textContent = n.name; $('#certPar').innerHTML = `$${esc(S.a.symbol)} <i>×</i> $${esc(S.b.symbol)} <em>${esc(S.d.shape)} · ${esc(S.d.dough)}</em>`;
-  $('#certNo').textContent = (Date.now() % 1e6).toString().padStart(6, '0'); $('#certBy').textContent = n.by === 'ai' ? 'named by AI' : 'named by the house';
+  $('#certName').textContent = n.name; $('#certPar').innerHTML = `$${esc(S.a.symbol)} <i>×</i> $${esc(S.b.symbol)}`;
+  $('#certNo').textContent = (Date.now() % 1e6).toString().padStart(6, '0'); $('#certBy').textContent = n.by === 'ai' ? 'named by AI' : 'auto-named';
   check();
 }
-function paint() { S.img = portrait(S.d, 512); if (!S.own) $('#certImg').src = S.img; $('#potFlat').src = S.img; }
+function paint() { S.img = portrait(S.d, 512); if (!S.own) $('#certImg').src = S.img; const f = $('#potFlat'); f.src = S.img; f.classList.remove('pop'); void f.offsetWidth; f.classList.add('pop'); }
 function check() { const ok = !!(S.d && $('#fName').value.trim() && /^[A-Za-z0-9]{1,10}$/.test($('#fTick').value.trim())); $('#launchBtn').disabled = !ok || S.busy; return ok; }
 
 async function fuse() {
-  if (!S.a || !S.b || S.busy) return; S.busy = true; $('#fuseBtn').disabled = true; $('#fuseBtn').textContent = 'Boiling…'; $('#potTools').hidden = true; stop();
+  if (!S.a || !S.b || S.busy) return; S.busy = true; $('#fuseBtn').disabled = true; $('#fuseBtn').textContent = 'Fusing…'; $('#potTools').hidden = true;
   $('#cap').classList.remove('on'); $('#born').hidden = true; $('#log').hidden = true; $('#log').innerHTML = '';
   try {
     const [ia, ib] = await Promise.all([loadImg(proxied(S.a.icon)), loadImg(proxied(S.b.icon))]);
     S.ta = ia ? tint(ia) : null; S.tb = ib ? tint(ib) : null; S.salt = rndSalt(); S.d = dna(S.a.mint, S.b.mint, S.salt, S.ta, S.tb);
     const naming = nameIt();
-    ensurePot(); if (S.pot && S.pot.ok) await S.pot.fuse({ img: ia, label: S.a.symbol }, { img: ib, label: S.b.symbol }, S.d);
+    await fuseFx(ia, ib);
     S.nm = await naming; paint(); fill(); caption(S.nm.name, S.nm.line);
-    say(S.nm.line, { pitch: S.d.pitch, rate: S.d.rate });
     $('#potTools').hidden = false; $('#cert').classList.remove('just'); void $('#cert').offsetWidth; $('#cert').classList.add('just');
     if (innerWidth < 980) setTimeout(() => $('#cert').scrollIntoView({ behavior: 'smooth', block: 'start' }), 900);
-  } catch (e) { toast('The pot boiled over: ' + (e.message || e)); }
+  } catch (e) { toast('Fuse failed: ' + (e.message || e)); }
   finally { S.busy = false; $('#fuseBtn').disabled = !(S.a && S.b); $('#fuseBtn').textContent = 'Fuse again'; check(); }
 }
 
@@ -105,33 +104,37 @@ async function launch(e) {
   try {
     log('Connecting your wallet…'); const p = await connect(); if (!p) throw new Error('no wallet'); log('Wallet ' + esc(short(wallet.addr)) + ' connected.', 'ok');
     await loadWeb3(); const W = window.solanaWeb3; const mintKp = W.Keypair.generate(); const mint = mintKp.publicKey.toBase58();
-    const desc = `${lore} Born on rot.actor from $${S.a.symbol} × $${S.b.symbol}.`.slice(0, 500);
-    log('1/5 Uploading the brainrot and its papers…');
+    const desc = `${lore} Launched on rot.actor from $${S.a.symbol} × $${S.b.symbol}.`.slice(0, 500);
+    log('1/5 Uploading the image and metadata to pump.fun IPFS…');
     const ip = await post('/api/launch', { op: 'ipfs', image: await shrink(S.own || S.img), name, symbol: sym, description: desc, twitter: x, website: location.origin + '/c/' + mint }, 45000);
     if (!ip.ok) throw new Error(ip.error || 'metadata upload failed');
-    log('2/5 Building the pump.fun launch…');
+    log('2/5 Building the pump.fun create transaction…');
     const tj = await post('/api/launch', { op: 'tx', publicKey: wallet.addr, mint, name, symbol: sym, uri: ip.uri, amount: buy }, 30000);
     if (!tj.ok) throw new Error(tj.error || 'launch build failed');
     const memo = `rot:v1:${S.a.mint}:${S.b.mint}:${mint}:${S.salt}.${code(S.d)}`;
-    log('3/5 Writing the bloodline into it…'); const vtx = await tag(W.VersionedTransaction.deserialize(b64d(tj.tx)), memo, new W.PublicKey(wallet.addr)); log('Bloodline: <code>' + esc(short(S.a.mint)) + ' × ' + esc(short(S.b.mint)) + '</code>', 'ok');
+    log('3/5 Adding the parents memo…'); const vtx = await tag(W.VersionedTransaction.deserialize(b64d(tj.tx)), memo, new W.PublicKey(wallet.addr)); log('Parents: <code>' + esc(short(S.a.mint)) + ' × ' + esc(short(S.b.mint)) + '</code>', 'ok');
     log('4/5 Approve it in your wallet…'); const signed = await p.signTransaction(vtx); signed.sign([mintKp]);
     const sig = await rpc('sendTransaction', [b64e(signed.serialize()), { encoding: 'base64', skipPreflight: false, preflightCommitment: 'confirmed', maxRetries: 3 }]);
     log(`5/5 Sent <a href="https://solscan.io/tx/${esc(sig)}" target="_blank" rel="noopener">${esc(short(sig))}</a>. Waiting for Solana…`);
     let ok = false;
     for (let i = 0; i < 40 && !ok; i++) { await new Promise(r => setTimeout(r, 1500)); try { const st = await rpc('getSignatureStatuses', [[sig]]); const v = st.value && st.value[0]; if (v && v.err) throw new Error('the launch failed on chain'); if (v && /confirmed|finalized/.test(v.confirmationStatus || '')) ok = true; } catch (er) { if (/failed on chain/.test(er.message)) throw er; } }
     if (!ok) { log('Not confirmed yet. Open the transaction link, it may still land.', 'err'); return; }
-    confetti(140); say(S.nm ? S.nm.line : name, { pitch: S.d.pitch, rate: S.d.rate });
-    const share = encodeURIComponent(`${name} ($${sym}) was just born on rot.actor\n$${S.a.symbol} × $${S.b.symbol} went into the pot. This came out.\n${location.origin}/c/${mint}`);
-    $('#born').innerHTML = `<b>It's alive.</b><span>$${esc(sym)} is live on pump.fun.</span><div class="row"><a class="btn gold" href="https://pump.fun/coin/${esc(mint)}" target="_blank" rel="noopener">Open on pump.fun</a><a class="btn" href="/c/${esc(mint)}">Its page</a><a class="btn" href="https://x.com/intent/post?text=${share}" target="_blank" rel="noopener">Post it</a></div>`;
+    confetti(140);
+    const share = encodeURIComponent(`${name} ($${sym}) just launched on pump.fun via rot.actor\n$${S.a.symbol} × $${S.b.symbol}\n${location.origin}/c/${mint}`);
+    $('#born').innerHTML = `<b>Launched.</b><span>$${esc(sym)} is live on pump.fun.</span><div class="row"><a class="btn gold" href="https://pump.fun/coin/${esc(mint)}" target="_blank" rel="noopener">Open on pump.fun</a><a class="btn" href="/c/${esc(mint)}">Its page</a><a class="btn" href="https://x.com/intent/post?text=${share}" target="_blank" rel="noopener">Post it</a></div>`;
     $('#born').hidden = false; log('Live. Its page fills in within a minute.', 'ok'); document.dispatchEvent(new CustomEvent('rot:born', { detail: { mint } }));
   } catch (er) { if (er.message !== 'no wallet') log(esc(/reject|denied|cancel/i.test(er.message) ? 'You cancelled it in your wallet.' : er.message || String(er)), 'err'); }
   finally { S.busy = false; check(); }
 }
 
-function flat() { $('#potBox').classList.add('flat'); $('#potGL').hidden = true; }
-function ensurePot() { if (!S.pot) { S.pot = initPot($('#potGL'), { mobile: S.mobile, onSlow: () => { flat(); if (S.img) $('#potFlat').src = S.img; } }); if (!S.pot.ok) flat(); } return S.pot; }
+// the two coins spin into each other, flash, and the brainrot appears
+function fuseFx(ia, ib) {
+  return new Promise(res => { const w = $('#fzw'); const face = (im, t) => im ? `<img src="${esc(im.src)}" alt="">` : `<span>$${esc(t.symbol)}</span>`;
+    const fx = document.createElement('div'); fx.className = 'fx'; fx.innerHTML = `<i class="fa">${face(ia, S.a)}</i><i class="fb">${face(ib, S.b)}</i><b></b>`;
+    w.classList.add('fusing'); w.append(fx); setTimeout(() => { fx.remove(); w.classList.remove('fusing'); res(); }, reduced ? 0 : 1500); });
+}
 export function initLab({ mobile = false } = {}) {
-  S.mobile = mobile; new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { ensurePot(); o.disconnect(); } }, { rootMargin: '900px 0px' }).observe($('#potBox'));
+  S.mobile = mobile;
   for (const k of ['a', 'b']) {
     $('#q' + k).addEventListener('input', () => deb(k, () => lookup(k)));
     $('#q' + k).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); lookup(k); } });
@@ -139,17 +142,16 @@ export function initLab({ mobile = false } = {}) {
     $('#c' + k).addEventListener('click', e => { if (e.target.closest('.clr')) setParent(k, null); });
   }
   $('#chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; const t = S.trend[+b.dataset.i]; if ((S.a && S.a.mint === t.mint)) return setParent('a', null); if (S.b && S.b.mint === t.mint) return setParent('b', null); setParent(!S.a ? 'a' : 'b', t); });
-  $('#rnd').addEventListener('click', () => { if (S.trend.length < 2) return toast('Trending list is still loading.'); const i = Math.floor(Math.random() * S.trend.length); let j = Math.floor(Math.random() * (S.trend.length - 1)); if (j >= i) j++; setParent('a', null); setParent('b', null); setParent('a', S.trend[i]); setParent('b', S.trend[j]); const pt = ensurePot(); pt.ok && pt.stir(); });
+  $('#rnd').addEventListener('click', () => { if (S.trend.length < 2) return toast('The coin list is still loading.'); const i = Math.floor(Math.random() * S.trend.length); let j = Math.floor(Math.random() * (S.trend.length - 1)); if (j >= i) j++; setParent('a', null); setParent('b', null); setParent('a', S.trend[i]); setParent('b', S.trend[j]); });
   $('#fuseBtn').addEventListener('click', fuse);
-  $('#reLook').addEventListener('click', async () => { if (!S.d || S.busy) return; S.salt = rndSalt(); S.d = dna(S.a.mint, S.b.mint, S.salt, S.ta, S.tb); if (ensurePot().ok) await S.pot.swap(S.d); paint(); fill(); });
-  $('#reName').addEventListener('click', async () => { if (!S.d || S.busy) return; $('#reName').disabled = true; S.salt = rndSalt(); S.nm = await nameIt(); $('#reName').disabled = false; fill(); caption(S.nm.name, S.nm.line); say(S.nm.line, { pitch: S.d.pitch, rate: S.d.rate }); });
-  $('#hear').addEventListener('click', () => { if (S.nm) say(S.nm.line, { pitch: S.d.pitch, rate: S.d.rate, force: true }); });
+  $('#reLook').addEventListener('click', async () => { if (!S.d || S.busy) return; S.salt = rndSalt(); S.d = dna(S.a.mint, S.b.mint, S.salt, S.ta, S.tb); paint(); fill(); });
+  $('#reName').addEventListener('click', async () => { if (!S.d || S.busy) return; $('#reName').disabled = true; S.salt = rndSalt(); S.nm = await nameIt(); $('#reName').disabled = false; fill(); caption(S.nm.name, S.nm.line); });
   ['#fName', '#fTick'].forEach(id => $(id).addEventListener('input', () => { if (id === '#fTick') $(id).value = $(id).value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (id === '#fName') $('#certName').textContent = $('#fName').value || '—'; check(); }));
   $$('[data-buy]').forEach(b => b.addEventListener('click', () => { $('#fBuy').value = b.dataset.buy; }));
   $('#fImg').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; if (f.size > 8e6) { toast('Images up to 8 MB.'); e.target.value = ''; return; } const r = new FileReader(); r.onload = () => { S.own = r.result; $('#certImg').src = S.own; $('#ownClr').hidden = false; }; r.readAsDataURL(f); });
   $('#ownClr').addEventListener('click', () => { S.own = null; $('#fImg').value = ''; $('#ownClr').hidden = true; if (S.img) $('#certImg').src = S.img; });
   $('#cert').addEventListener('submit', launch);
-  api('/api/trending').then(j => { S.trend = (j && j.ok && j.list) || []; renderChips(); });
+  trending().then(j => { S.trend = (j && j.ok && j.list) || []; S.trendDone = true; renderChips(); });
   renderChips();
   // deep link: /#fuse?a=<mint>&b=<mint>
   const q = new URLSearchParams((location.hash.split('?')[1]) || location.search.slice(1));

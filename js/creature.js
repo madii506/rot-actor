@@ -4,7 +4,7 @@ import { RoomEnvironment } from '/vendor/RoomEnvironment.js';
 import { hash, rng } from './names.js';
 
 export const SHAPES = ['rotini', 'penne', 'rigatoni', 'maccheroni', 'farfalle', 'gnocco'];
-const HATS = ['none', 'crown', 'toque', 'party', 'beret', 'bow', 'phones', 'none'];
+const HATS = ['none', 'crown', 'phones', 'party', 'beret', 'bow', 'phones', 'none'];
 const POSES = ['wave', 'hips', 'up', 'point'];
 const DOUGHS = ['classico', 'spinaci', 'pomodoro', 'nero', 'barbabietola', 'curcuma', 'viola'];
 const ACCENTS = ['#ff4d6d', '#ffd23f', '#3ddc97', '#7b5cff', '#ff8a3d', '#1fb6ff', '#ffffff'];
