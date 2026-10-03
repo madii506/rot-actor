@@ -3,33 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>rot.actor</title>
-<meta name="description" content="Two coins in. One brainrot out. Fuse any two Solana coins into a talking pasta brainrot and launch it on pump.fun.">
+<title>rot</title>
+<meta name="description" content="Pair any two Solana memecoins into one Italian-brainrot character and launch it as a new coin on pump.fun.">
 <meta name="theme-color" content="#2f82e6">
-<meta property="og:title" content="rot.actor">
-<meta property="og:description" content="Two coins in. One brainrot out.">
+<meta property="og:title" content="rot">
+<meta property="og:description" content="Pair two memecoins. Launch the brainrot on pump.fun.">
 <meta property="og:image" content="/assets/og.png">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="/assets/og.png">
-<link rel="icon" href="/assets/fav-64.png" sizes="64x64">
+<link rel="icon" href="/assets/rot-32.png" sizes="32x32">
+<link rel="icon" href="/assets/rot-64.png" sizes="64x64">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
 <link rel="preload" href="/assets/bagel.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=1">
+<link rel="stylesheet" href="/css/style.css?v=2">
 <script type="importmap">{"imports":{"three":"/vendor/three.module.min.js"}}</script>
 </head>
 <body>
-<a class="skip" href="#fuse">Skip to the pot</a>
-<div class="intro" id="intro" hidden>
-  <canvas id="introGL" aria-hidden="true"></canvas>
-  <img class="i-flat" src="/assets/cast.png" alt="">
-  <div class="lb t"></div><div class="lb b"></div>
-  <p class="i-cap" id="iCap"></p>
-  <div class="i-title"><div class="word">r<span class="ge"><b></b></span>t<span class="dot">.</span>act<span class="ge"><b></b></span>r</div><p>Two coins in. One brainrot out.</p>
-    <div class="i-btns"><button class="btn gold big" id="iSound" type="button">🔊 Enter with sound</button><button class="btn white big" id="iEnter" type="button">Enter</button></div></div>
-  <button class="i-skip" id="iSkip" type="button">SKIP ›</button>
-</div>
-
+<a class="skip" href="#fuse">Skip to the launchpad</a>
 <header class="nav" id="nav">
   <a class="logo" href="#top" aria-label="rot.actor home"><span class="logo-eyes"><i class="ge sm"><b></b></i><i class="ge sm"><b></b></i></span><span class="logo-t">rot<em>.</em>actor</span></a>
   <nav class="links" id="links">
@@ -37,9 +28,8 @@
     <a class="x-link" id="navX" href="#" target="_blank" rel="noopener" hidden>𝕏</a>
   </nav>
   <div class="nav-r">
-    <button class="icon-btn" id="snd" type="button" aria-pressed="false" title="Sound"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w1" d="M16 9.5a3.5 3.5 0 0 1 0 5"/><path class="w2" d="M18.5 7a7 7 0 0 1 0 10"/><path class="off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
     <button class="btn ghost sm" id="walletBtn" type="button">Connect wallet</button>
-    <a class="btn gold sm hide-s" href="#fuse">Fuse two coins</a>
+    <a class="btn gold sm hide-s" href="#fuse">Pair two coins</a>
     <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><i></i><i></i></button>
   </div>
 </header>
@@ -49,14 +39,14 @@
 <section class="hero" id="top">
   <div class="hero-pin">
     <div class="sun" aria-hidden="true"></div><div class="dots" aria-hidden="true"></div>
-    <canvas id="heroGL" aria-label="The rot.actor cast: pasta brainrots with googly eyes"></canvas>
+    <canvas id="heroGL" aria-label="The rot.actor cast: brainrot characters with googly eyes"></canvas>
     <img class="hero-fallback" src="/assets/cast.png" alt="" hidden>
     <div class="hero-copy">
       <h1 class="word" id="heroWord" aria-label="rot.actor">r<span class="ge"><b></b></span>t<span class="dot">.</span>act<span class="ge"><b></b></span>r</h1>
       <p class="tag"><span>Two coins in.</span> <span>One brainrot out.</span></p>
-      <p class="sub">Drop any two Solana coins in the pot. A pasta brainrot climbs out with a name, a face and a voice, and you launch it on pump.fun.</p>
-      <div class="cta"><a class="btn gold big" href="#fuse">Fuse two coins</a><a class="btn white big" href="#bestiary">Meet the brainrots</a></div>
-      <div class="hero-live"><span class="dot-live"></span><span id="liveBorn">— born</span><span id="liveFam">— families</span><span id="liveGen">deepest gen —</span></div>
+      <p class="sub">Pair any two Solana memecoins. rot.actor turns them into one 3D Italian-brainrot character, an AI names it, and you launch it on pump.fun from your own wallet.</p>
+      <div class="cta"><a class="btn gold big" href="#fuse">Pair two coins</a><a class="btn white big" href="#bestiary">See launches</a></div>
+      <div class="hero-live"><span class="dot-live"></span><span id="liveBorn">— launched today</span><span id="liveFam">— pairs</span><span id="liveGen">deepest gen —</span></div>
     </div>
     <div class="poke-hint" aria-hidden="true">poke one ↗</div>
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
@@ -64,8 +54,8 @@
 </section>
 
 <div class="band" aria-hidden="true">
-  <div class="band-row r1"><span>TWO COINS IN</span><i>✦</i><span>ONE BRAINROT OUT</span><i>✦</i><span>MAMMA MIA</span><i>✦</i><span>AL DENTE</span><i>✦</i><span>IT TALKS</span><i>✦</i><span>IT LAUNCHES</span><i>✦</i><span>TWO COINS IN</span><i>✦</i><span>ONE BRAINROT OUT</span><i>✦</i><span>MAMMA MIA</span><i>✦</i><span>AL DENTE</span><i>✦</i><span>IT TALKS</span><i>✦</i><span>IT LAUNCHES</span><i>✦</i></div>
-  <div class="band-row r2"><span>rotini</span><i>●</i><span>penne</span><i>●</i><span>rigatoni</span><i>●</i><span>maccheroni</span><i>●</i><span>farfalle</span><i>●</i><span>gnocco</span><i>●</i><span>rotini</span><i>●</i><span>penne</span><i>●</i><span>rigatoni</span><i>●</i><span>maccheroni</span><i>●</i><span>farfalle</span><i>●</i><span>gnocco</span><i>●</i></div>
+  <div class="band-row r1"><span>PAIR ANY TWO COINS</span><i>✦</i><span>GET A BRAINROT</span><i>✦</i><span>LAUNCH ON PUMP.FUN</span><i>✦</i><span>AI NAMES</span><i>✦</i><span>BLOODLINES ON SOLANA</span><i>✦</i><span>YOUR WALLET, YOUR COIN</span><i>✦</i><span>PAIR ANY TWO COINS</span><i>✦</i><span>GET A BRAINROT</span><i>✦</i><span>LAUNCH ON PUMP.FUN</span><i>✦</i><span>AI NAMES</span><i>✦</i><span>BLOODLINES ON SOLANA</span><i>✦</i><span>YOUR WALLET, YOUR COIN</span><i>✦</i></div>
+  <div class="band-row r2"><span>$BONK × $WIF</span><i>●</i><span>$POPCAT × $MEW</span><i>●</i><span>$FARTCOIN × $PENGU</span><i>●</i><span>$MOODENG × $GOAT</span><i>●</i><span>$PNUT × $BOME</span><i>●</i><span>$GIGA × $CHILLGUY</span><i>●</i><span>$BONK × $WIF</span><i>●</i><span>$POPCAT × $MEW</span><i>●</i><span>$FARTCOIN × $PENGU</span><i>●</i><span>$MOODENG × $GOAT</span><i>●</i><span>$PNUT × $BOME</span><i>●</i><span>$GIGA × $CHILLGUY</span><i>●</i></div>
 </div>
 
 <!-- RECIPE (horizontal) -->
@@ -74,20 +64,20 @@
     <div class="rec-head"><span class="kick">THE RECIPE</span><div class="rec-bar"><i id="recBar"></i></div><span class="rec-n" id="recN">1/4</span></div>
     <div class="rec-track" id="recTrack">
       <article class="rec-panel p1">
-        <div class="rec-txt"><b class="num">01</b><h2 class="split">Pick two coins.</h2><p>Any two on Solana. Paste a contract address or tap a trending one. They don't have to be yours.</p></div>
-        <div class="vis vis-coins" aria-hidden="true"><div class="coin3d c1"><span>$ANY</span></div><b class="times">×</b><div class="coin3d c2"><span>$COIN</span></div></div>
+        <div class="rec-txt"><b class="num">01</b><h2 class="split">Pick two memecoins.</h2><p>Any two coins on Solana. Paste a contract address, search a ticker or tap a memecoin from the list. You don't need to hold them.</p></div>
+        <div class="vis vis-coins" aria-hidden="true"><div class="coin3d c1"><img id="rc1" alt="" hidden><span id="rs1">$BONK</span></div><b class="times">×</b><div class="coin3d c2"><img id="rc2" alt="" hidden><span id="rs2">$WIF</span></div></div>
       </article>
       <article class="rec-panel p2">
-        <div class="rec-txt"><b class="num">02</b><h2 class="split">Into the pot.</h2><p>Both go in the boiling water. The first coin becomes its body, the second its style, colours from both.</p></div>
-        <div class="vis vis-pot" aria-hidden="true"><div class="fall f1">$ANY</div><div class="fall f2">$COIN</div><div class="steam"><i></i><i></i><i></i></div><div class="cpot"><div class="soup"><i></i><i></i><i></i><i></i><i></i></div></div></div>
+        <div class="rec-txt"><b class="num">02</b><h2 class="split">They fuse.</h2><p>The pair decides the character's body, eyes and hat. Coin 1's logo colour becomes its main colour, coin 2's the accent. The 3D model is built right in your browser.</p></div>
+        <div class="vis vis-pot" aria-hidden="true"><div class="fall f1" id="rf1">$BONK</div><div class="fall f2" id="rf2">$WIF</div><div class="vortex"><i></i><i></i></div></div>
       </article>
       <article class="rec-panel p3">
-        <div class="rec-txt"><b class="num">03</b><h2 class="split">A brainrot climbs out.</h2><p>Six pasta bodies, seven doughs, googly eyes, a hat if it's lucky. An AI gives it a sing-song Italian name.</p></div>
-        <div class="vis vis-born" aria-hidden="true"><div class="ex"><img id="exImg" alt=""><span class="ex-tag">example</span></div><b class="ex-name" id="exName">—</b></div>
+        <div class="rec-txt"><b class="num">03</b><h2 class="split">AI names the brainrot.</h2><p>An AI writes an Italian-brainrot name, ticker, lore and catchphrase from both parents. Reroll the look or the name until it's right.</p></div>
+        <div class="vis vis-born" aria-hidden="true"><div class="ex"><img id="exImg" alt=""><span class="ex-tag">$BONK × $WIF</span></div><b class="ex-name" id="exName">—</b></div>
       </article>
       <article class="rec-panel p4">
-        <div class="rec-txt"><b class="num">04</b><h2 class="split">It launches and talks.</h2><p>You launch it on pump.fun from your own wallet. It gets its own page, a voice and a seat in the bestiary.</p></div>
-        <div class="vis vis-live" aria-hidden="true"><div class="phone"><img id="exImg2" alt=""><b id="exName2">—</b><small id="exTick">$—</small><div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="bubble" id="exLine">…</div></div>
+        <div class="rec-txt"><b class="num">04</b><h2 class="split">Launch on pump.fun.</h2><p>It launches as a new pump.fun coin from your wallet, with both parents written into the launch transaction on Solana. It gets its own page and a card in the bestiary.</p></div>
+        <div class="vis vis-live" aria-hidden="true"><div class="phone"><img id="exImg2" alt=""><b id="exName2">—</b><small id="exTick">$—</small><div class="mini-curve"><span>bonding curve</span><i><em></em></i></div></div><div class="bubble" id="exLine">…</div></div>
       </article>
     </div>
   </div>
@@ -95,37 +85,37 @@
 
 <!-- THE LAB -->
 <section class="lab" id="fuse">
-  <div class="lab-head" data-r><span class="kick">THE POT</span><h2 class="split">Fuse two coins.</h2><p>Pick the parents, boil them, name the bambino, launch it. It takes about a minute.</p></div>
+  <div class="lab-head" data-r><span class="kick">THE LAUNCHPAD</span><h2 class="split">Pair two coins.</h2><p>Pick two coins, fuse them, check the name and ticker, then launch on pump.fun. It takes about a minute.</p></div>
   <div class="lab-grid">
     <div class="parents" data-r>
       <div class="slot" data-slot="a">
-        <label for="qa">Parent 1 <small>the body</small></label>
+        <label for="qa">Coin 1 <small>sets the main colour</small></label>
         <div class="pick"><input id="qa" placeholder="Paste a CA or type a ticker" autocomplete="off" spellcheck="false"><div class="drop" id="da"></div></div>
         <div class="chosen" id="ca" hidden></div>
       </div>
       <div class="xmark" aria-hidden="true">×</div>
       <div class="slot" data-slot="b">
-        <label for="qb">Parent 2 <small>the style</small></label>
+        <label for="qb">Coin 2 <small>sets the accent colour</small></label>
         <div class="pick"><input id="qb" placeholder="Paste a CA or type a ticker" autocomplete="off" spellcheck="false"><div class="drop" id="db"></div></div>
         <div class="chosen" id="cb" hidden></div>
       </div>
-      <div class="trend"><div class="trend-h"><span>Trending now</span><button type="button" class="btn ghost xs" id="rnd">Random pair</button></div><div class="chips" id="chips"></div></div>
+      <div class="trend"><div class="trend-h"><span>Memecoins</span><button type="button" class="btn ghost xs" id="rnd">Random pair</button></div><div class="chips" id="chips"></div></div>
     </div>
-    <div class="potbox" id="potBox" data-r>
-      <canvas id="potGL" aria-label="A boiling pot of pasta"></canvas><img id="potFlat" src="/assets/egg.png" alt="Your brainrot">
+    <div class="potbox flat" id="potBox" data-r>
+      <div class="fzw" id="fzw"><img id="potFlat" src="/assets/rot-egg.png" alt="Your brainrot"></div>
       <div class="cap" id="cap" aria-live="polite"></div>
       <p class="pot-hint" id="potHint">Pick two coins.</p>
       <button class="btn gold big fuse" id="fuseBtn" type="button" disabled>Fuse them</button>
-      <div class="pot-tools" id="potTools" hidden><button class="btn white sm" id="reLook" type="button">New look</button><button class="btn white sm" id="reName" type="button">New name</button><button class="btn white sm" id="hear" type="button">🔊 Hear it</button></div>
+      <div class="pot-tools" id="potTools" hidden><button class="btn white sm" id="reLook" type="button">New look</button><button class="btn white sm" id="reName" type="button">New name</button></div>
     </div>
     <form class="cert" id="cert" data-r novalidate>
-      <div class="cert-top"><img id="certImg" src="/assets/egg.png" alt="Your brainrot"><div><small>BIRTH CERTIFICATE Nº <span id="certNo">—</span></small><b id="certName">Waiting for two parents</b><span id="certPar">The pot is boiling.</span><em id="certBy"></em></div></div>
+      <div class="cert-top"><img id="certImg" src="/assets/rot-egg.png" alt="Your brainrot"><div><small>NEW COIN Nº <span id="certNo">—</span></small><b id="certName">Waiting for two coins</b><span id="certPar">Pick two coins to start.</span><em id="certBy"></em></div></div>
       <div class="f2"><label>Name<input id="fName" maxlength="32" autocomplete="off"></label><label>Ticker<input id="fTick" maxlength="10" autocomplete="off"></label></div>
       <label>Lore<textarea id="fLore" maxlength="360" rows="3"></textarea></label>
       <label>X link <small>optional</small><input id="fX" placeholder="https://x.com/yourhandle" autocomplete="off"></label>
       <label>Dev buy <small>SOL, optional</small><div class="buyrow"><input id="fBuy" type="number" min="0" max="50" step="0.01" value="0"><button type="button" data-buy="0">0</button><button type="button" data-buy="0.1">0.1</button><button type="button" data-buy="0.5">0.5</button><button type="button" data-buy="1">1</button></div></label>
       <div class="own"><label class="file">Use my own image<input id="fImg" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label><button type="button" class="linkish" id="ownClr" hidden>use the brainrot again</button></div>
-      <p class="cost">You pay pump.fun's launch costs (about 0.02 SOL) plus your dev buy. rot.actor takes nothing. You sign in your own wallet, and you're the coin's creator.</p>
+      <p class="cost">You pay pump.fun's launch costs (about 0.02 SOL), your dev buy, and PumpPortal's 0.5% fee on that buy. rot.actor adds no fee. You sign in your own wallet, so you're the coin's creator.</p>
       <button class="btn gold big" id="launchBtn" type="submit" disabled>Launch on pump.fun</button>
       <ol class="log" id="log" hidden></ol>
       <div class="born" id="born" hidden></div>
@@ -136,29 +126,28 @@
 <!-- BESTIARY -->
 <section class="bestiary" id="bestiary">
   <div class="b-head" data-r>
-    <div><span class="kick">THE BESTIARY</span><h2 class="split">Everyone who climbed out.</h2></div>
-    <div class="b-stats"><div><b id="bBorn">—</b><small>born</small></div><div><b id="bFam">—</b><small>families</small></div><div><b id="bGen">—</b><small>deepest gen</small></div></div>
+    <div><span class="kick">THE BESTIARY</span><h2 class="split">Every brainrot launched here.</h2></div>
+    <div class="b-stats"><div><b id="bBorn">—</b><small>launched</small></div><div><b id="bFam">—</b><small>pairs</small></div><div><b id="bGen">—</b><small>deepest gen</small></div></div>
   </div>
-  <div class="tabs" role="tablist" data-r><button class="on" data-tab="new" role="tab">Newborn</button><button data-tab="top" role="tab">Biggest</button><button data-tab="gen" role="tab">Deepest</button><button data-tab="kids" role="tab">Most bambini</button></div>
+  <div class="tabs" role="tablist" data-r><button class="on" data-tab="new" role="tab">New</button><button data-tab="top" role="tab">Market cap</button><button data-tab="gen" role="tab">Generation</button><button data-tab="kids" role="tab">Most children</button></div>
   <div class="grid" id="grid"></div>
-  <div class="b-empty" id="bEmpty" hidden><img src="/assets/egg.png" alt=""><b>Nobody has climbed out yet.</b><span>The bestiary fills itself from Solana. The first brainrot could be yours.</span><a class="btn gold" href="#fuse">Fuse the first one</a></div>
-  <div class="wanted" id="wantedBox" hidden><h3>Most wanted parents</h3><div class="wanted-row" id="wanted"></div></div>
+  <div class="b-empty" id="bEmpty" hidden><img src="/assets/rot-egg.png" alt=""><b>No launches yet.</b><span>The bestiary reads every rot.actor launch straight from Solana. The first one could be yours.</span><a class="btn gold" href="#fuse">Launch the first one</a></div>
+  <div class="wanted" id="wantedBox" hidden><h3>Most paired parents</h3><div class="wanted-row" id="wanted"></div></div>
 </section>
 
 <!-- STAGE -->
 <section class="stage" id="stage">
   <div class="theatre">
-    <div class="sign"><span>NOW PERFORMING</span><b id="actName">—</b><small id="actSub"></small></div>
+    <div class="sign"><span>ON STAGE</span><b id="actName">—</b><small id="actSub"></small></div>
     <div class="boards"><div class="spot"></div><div class="performer" id="performer"><img id="actImg" alt=""><div class="shadow"></div></div><div class="bubble" id="actLine"></div></div>
     <div class="curtain l"></div><div class="curtain r"></div><div class="valance"></div>
     <div class="act-ctl"><button class="btn gold" id="actPlay" type="button">▶ Perform</button><button class="btn white" id="actNext" type="button">Next act</button><button class="btn white" id="actClap" type="button">👏 <span id="clapN">0</span></button></div>
   </div>
-  <p class="stage-note" id="stageNote">Every brainrot gets a turn on stage. Sound plays when you press Perform.</p>
 </section>
 
 <!-- BLOODLINES -->
 <section class="bloodlines" id="bloodlines">
-  <div class="bl-head" data-r><span class="kick">BLOODLINES</span><h2 class="split">Brainrots can be parents too.</h2><p>Fuse a brainrot with anything and the family grows. Generation one, two, fifteen. Every link is written on Solana.</p></div>
+  <div class="bl-head" data-r><span class="kick">BLOODLINES</span><h2 class="split">Pair a brainrot again.</h2><p>A launched brainrot can be a parent too. Pair it with any coin and the child is generation two, then three, and so on. Every link is a memo on Solana, so the tree is rebuilt from the chain.</p></div>
   <div class="tree" id="tree"></div>
 </section>
 
@@ -169,30 +158,25 @@
 
 <!-- FAQ -->
 <section class="faq" id="faq">
-  <div class="faq-head" data-r><span class="kick">FAQ</span><h2 class="split">Questions from the kitchen.</h2></div>
+  <div class="faq-head" data-r><span class="kick">FAQ</span><h2 class="split">How it works.</h2></div>
   <div class="qs">
-    <details data-r><summary>What happens when I fuse two coins?</summary><p>Both coins go into the pot. The first decides the pasta body and dough colour, the second the eyes, hat and accent. An AI writes a sing-song Italian name, a ticker and a line for it to say. Nothing is launched until you press Launch and sign.</p></details>
-    <details data-r><summary>Do I need to own the parent coins?</summary><p>No. Any two Solana coins work, even ones that never touched rot.actor. Your launch only reads their name, ticker and picture.</p></details>
-    <details data-r><summary>What does it cost?</summary><p>pump.fun's own launch costs (about 0.02 SOL) plus any dev buy you choose. rot.actor charges nothing.</p></details>
-    <details data-r><summary>Who is the creator of my brainrot?</summary><p>You. It launches from your wallet, so pump.fun's creator fees go to you. rot.actor never holds your keys or your coins.</p></details>
-    <details data-r><summary>Do the parent coins earn anything?</summary><p>No. They get a child and a place in its bloodline on Solana, and their name on its pump.fun page. That's all.</p></details>
-    <details data-r><summary>How does the bestiary know my coin?</summary><p>Every rot.actor launch carries a short note on Solana with both parents. The bestiary and the family trees are rebuilt from those notes, not from a database.</p></details>
-    <details data-r><summary>Is the voice an AI?</summary><p>It's your browser's own speech voice, Italian when your device has one. Sound only plays after you turn it on or press a speak button.</p></details>
+    <details data-r><summary>What happens when I pair two coins?</summary><p>rot.actor reads each coin's name, ticker and logo. The pair decides the character's body, eyes and hat, and the two logo colours become its main colour and accent. The 3D model is built and rendered in your browser, and an AI writes the name, ticker, lore and catchphrase. Nothing launches until you press Launch and sign.</p></details>
+    <details data-r><summary>Do I need to hold the parent coins?</summary><p>No. Any two Solana coins work, including ones that have never touched rot.actor. Only their public name, ticker and logo are read.</p></details>
+    <details data-r><summary>How does the launch work?</summary><p>The image and metadata are uploaded to pump.fun's IPFS. PumpPortal builds the create transaction, your browser generates the new mint key, and your wallet signs. The result is a normal pump.fun coin on its bonding curve.</p></details>
+    <details data-r><summary>Who is the creator?</summary><p>You. It launches from your wallet, so pump.fun's creator fees go to you. rot.actor never holds your keys or your coins.</p></details>
+    <details data-r><summary>What does it cost?</summary><p>pump.fun's launch costs (about 0.02 SOL), plus any dev buy you choose and PumpPortal's 0.5% fee on that buy. rot.actor adds no fee.</p></details>
+    <details data-r><summary>How are the parents recorded?</summary><p>The launch transaction carries a memo with both parent mints, the new mint and the look code, plus a read-only rot.actor registry key. The bestiary and bloodlines are rebuilt from those transactions. There's no database.</p></details>
+    <details data-r><summary>Do the parent coins get anything?</summary><p>No. They're named as parents on the child's pump.fun page and in its bloodline. No fees or tokens go to them.</p></details>
     <details data-r><summary>Is rot.actor part of pump.fun?</summary><p>No. rot.actor is an independent site that launches coins through pump.fun. Memecoins can go to zero, and nothing here is financial advice.</p></details>
   </div>
 </section>
 </main>
 
-<footer class="foot">
-  <div class="foot-word" id="footWord" aria-label="rot.actor">r<span class="ge"><b></b></span>t<span class="dot">.</span>act<span class="ge"><b></b></span>r</div>
-  <div class="foot-row"><a href="#fuse">Fuse</a><a href="#bestiary">Bestiary</a><a href="#stage">Stage</a><a href="#faq">FAQ</a><a id="footX" href="#" target="_blank" rel="noopener" hidden>𝕏</a></div>
-  <p class="foot-note">Independent. Not affiliated with pump.fun. Memecoins can go to zero. Nothing here is financial advice.</p>
-</footer>
 
 <div id="toast" role="status" aria-live="polite"></div>
 <script src="/vendor/gsap.min.js"></script>
 <script src="/vendor/ScrollTrigger.min.js"></script>
 <script src="/vendor/lenis.min.js"></script>
-<script type="module" src="/js/app.js?v=1"></script>
+<script type="module" src="/js/app.js?v=2"></script>
 </body>
 </html>

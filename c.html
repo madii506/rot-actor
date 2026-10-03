@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>rot.actor</title>
-<meta name="description" content="A brainrot born on rot.actor.">
+<title>rot</title>
+<meta name="description" content="A brainrot launched on rot.actor.">
 <meta name="theme-color" content="#2f82e6">
 <meta property="og:image" content="/assets/og.png">
-<link rel="icon" href="/assets/fav-64.png" sizes="64x64">
+<link rel="icon" href="/assets/rot-32.png" sizes="32x32">
+<link rel="icon" href="/assets/rot-64.png" sizes="64x64">
 <link rel="apple-touch-icon" href="/assets/icon-180.png">
 <link rel="preload" href="/assets/bagel.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css?v=1">
+<link rel="stylesheet" href="/css/style.css?v=2">
 <script type="importmap">{"imports":{"three":"/vendor/three.module.min.js"}}</script>
 </head>
 <body class="cpage">
@@ -18,8 +19,7 @@
   <a class="logo" href="/" aria-label="rot.actor home"><span class="logo-eyes"><i class="ge sm"><b></b></i><i class="ge sm"><b></b></i></span><span class="logo-t">rot<em>.</em>actor</span></a>
   <nav class="links" id="links"><a href="/#fuse">Fuse</a><a href="/#bestiary">Bestiary</a><a href="/#stage">Stage</a><a href="/#faq">FAQ</a></nav>
   <div class="nav-r">
-    <button class="icon-btn" id="snd" type="button" aria-pressed="false" title="Sound"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w1" d="M16 9.5a3.5 3.5 0 0 1 0 5"/><path class="w2" d="M18.5 7a7 7 0 0 1 0 10"/><path class="off" d="M16 9l5 6M21 9l-5 6"/></svg></button>
-    <a class="btn gold sm" href="/#fuse">Fuse two coins</a>
+    <a class="btn gold sm" href="/#fuse">Pair two coins</a>
     <button class="burger" id="burger" type="button" aria-label="Menu" aria-expanded="false"><i></i><i></i></button>
   </div>
 </header>
@@ -31,17 +31,16 @@
       <h1 class="c-name" id="cName">Looking it up…</h1>
       <div class="c-sym"><code id="cSym">$—</code><button class="btn white xs" id="cCopy" type="button">Copy CA</button></div>
       <div class="c-par" id="cPar"></div>
-      <div class="c-line"><p class="bubble" id="cLine">…</p><button class="btn white sm" id="cHear" type="button">🔊 Hear it</button></div>
-      <div class="c-btns"><a class="btn gold big" id="cBuy" href="#" target="_blank" rel="noopener">Buy on pump.fun</a><a class="btn white" id="cFuse" href="/#fuse">Fuse with it</a><a class="btn white" id="cShare" href="#" target="_blank" rel="noopener">Post it</a></div>
+      <div class="c-line"><p class="bubble" id="cLine">…</p></div>
+      <div class="c-btns"><a class="btn gold big" id="cBuy" href="#" target="_blank" rel="noopener">Buy on pump.fun</a><a class="btn white" id="cFuse" href="/#fuse">Pair it with a coin</a><a class="btn white" id="cShare" href="#" target="_blank" rel="noopener">Post it</a></div>
     </div>
   </section>
   <section class="c-stats" id="cStats"></section>
   <section class="c-chart" id="cChartBox"><h2 class="h3">Chart</h2><div class="c-chart-in" id="cChart"><p class="dl">The chart appears after the first trades.</p></div></section>
-  <section class="c-fam"><h2 class="h3">Its bambini</h2><div class="grid" id="cKids"></div><p class="dl" id="cNoKids">No bambini yet. <a href="/#fuse" id="cKidLink">Fuse it with another coin</a> and it becomes a parent.</p></section>
-  <section class="c-miss" id="cMiss" hidden><img src="/assets/egg.png" alt=""><b>Not in the bestiary.</b><span id="cMissT">This coin wasn't born on rot.actor, or it was born seconds ago. Try again in a minute.</span><a class="btn gold" href="/#fuse">Fuse two coins</a></section>
+  <section class="c-fam"><h2 class="h3">Its children</h2><div class="grid" id="cKids"></div><p class="dl" id="cNoKids">No children yet. <a href="/#fuse" id="cKidLink">Pair it with another coin</a> and it becomes a parent.</p></section>
+  <section class="c-miss" id="cMiss" hidden><img src="/assets/rot-egg.png" alt=""><b>Not in the bestiary.</b><span id="cMissT">This coin wasn't launched on rot.actor, or it launched seconds ago. Try again in a minute.</span><a class="btn gold" href="/#fuse">Pair two coins</a></section>
 </main>
-<footer class="foot"><div class="foot-row"><a href="/">rot.actor</a><a href="/#fuse">Fuse</a><a href="/#bestiary">Bestiary</a><a href="/#faq">FAQ</a></div><p class="foot-note">Independent. Not affiliated with pump.fun. Memecoins can go to zero. Nothing here is financial advice.</p></footer>
 <div id="toast" role="status" aria-live="polite"></div>
-<script type="module" src="/js/coin.js?v=1"></script>
+<script type="module" src="/js/coin.js?v=2"></script>
 </body>
 </html>
