@@ -21,5 +21,5 @@ async function rpc(method, params, ms = 12000) {
 const mem = {}; async function cached(key, ms, fn) { const c = mem[key]; if (c && Date.now() - c.t < ms) return c.v; const v = await fn(); mem[key] = { t: Date.now(), v }; return v; }
 // Jupiter token search: one mint, a comma list of mints, or one symbol/name.
 async function jup(query) { return getJson('https://lite-api.jup.ag/tokens/v2/search?query=' + encodeURIComponent(query), {}, 8000); }
-function tok(t) { return t && { mint: t.id, name: t.name, symbol: t.symbol, icon: t.icon || null, mcap: t.mcap ?? t.fdv ?? null, price: t.usdPrice ?? null, holders: t.holderCount ?? null, liq: t.liquidity ?? null, verified: !!t.isVerified, pad: t.launchpad || null, chg: t.stats24h ? t.stats24h.priceChange : null, vol: t.stats24h ? ((t.stats24h.buyVolume || 0) + (t.stats24h.sellVolume || 0)) : null }; }
+function tok(t) { return t && { mint: t.id, name: t.name, symbol: String(t.symbol ?? '').replace(/^\$+/, ''), icon: t.icon || null, mcap: t.mcap ?? t.fdv ?? null, price: t.usdPrice ?? null, holders: t.holderCount ?? null, liq: t.liquidity ?? null, verified: !!t.isVerified, pad: t.launchpad || null, chg: t.stats24h ? t.stats24h.priceChange : null, vol: t.stats24h ? ((t.stats24h.buyVolume || 0) + (t.stats24h.sellVolume || 0)) : null }; }
 module.exports = { get, getJson, send, wrap, body, rpc, cached, jup, tok, B58 };

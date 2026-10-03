@@ -4,13 +4,13 @@ const L = require('./_lib');
 const MODELS = ['openai/gpt-4.1-mini', 'openai/gpt-4o-mini', 'google/gemini-2.5-flash', 'anthropic/claude-haiku-4.5'];
 const clean = (s, n) => String(s || '').replace(/[\u0000-\u001f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
 function prompt(a, b, shape) {
-  return [{ role: 'system', content: 'You name Italian-brainrot creatures for a memecoin launchpad. Every creature is born when two Solana memecoins are boiled in one pot of pasta. Reply with JSON only.' },
-    { role: 'user', content: `Parent A: "${clean(a.name, 40)}" ($${clean(a.symbol, 12)}). Parent B: "${clean(b.name, 40)}" ($${clean(b.symbol, 12)}). Its body is ${clean(shape, 20)} pasta.
+  return [{ role: 'system', content: 'You name Italian-brainrot characters for a memecoin launchpad. Every character is created by pairing two Solana memecoins. Never mention pasta, food or cooking. Reply with JSON only.' },
+    { role: 'user', content: `Parent A: "${clean(a.name, 40)}" ($${clean(a.symbol, 12)}). Parent B: "${clean(b.name, 40)}" ($${clean(b.symbol, 12)}).
 Return JSON with exactly these keys:
 "name": a two-word sing-song pseudo-Italian name that audibly blends both parents, in the style of Italian brainrot names (example: "Bonkolino Fartellini"). Max 28 characters. No real people, no slurs.
 "ticker": 3 to 10 uppercase letters taken from the name.
-"lore": one absurd English sentence, max 170 characters, about how it was born from both parents. Mention both tickers.
-"line": the dramatic line it shouts on stage in Italian (simple, funny, max 120 characters), starting with its own name.
+"lore": one absurd English sentence, max 170 characters, about it being the child of both parents. Mention both tickers. No pasta or food.
+"line": its catchphrase in Italian (simple, funny, max 120 characters), starting with its own name. No pasta or food.
 No price talk, no promises, no calls to buy.` }];
 }
 async function ask(model, messages, token) {
